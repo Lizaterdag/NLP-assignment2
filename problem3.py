@@ -21,12 +21,6 @@ for i, line in enumerate(vocab):
     word_index_dict[line.strip()] = i
 vocab.close()
 
-# Write the dictionary to a file
-with codecs.open('word_to_index_100.txt', 'w', encoding='utf-8') as wf:
-    # Convert the dictionary to a string and write it to the file
-    wf.write(str(word_index_dict))
-wf.close()
-
 f = codecs.open("brown_100.txt")
 
 #initialize numpy 0s array
@@ -34,14 +28,13 @@ vocab_size = len(word_index_dict)
 counts = np.zeros((vocab_size, vocab_size), dtype=int)
 
 #iterate through file and update counts
+previous_word = '<s>'
 for line in f:
-    words = line.strip().split()
-    if len(words) > 1:
-        prev_word = '<s>' 
-        for word in words:
-            if word in word_index_dict and prev_word in word_index_dict:
-                counts[word_index_dict[prev_word], word_index_dict[word]] += 1
-            prev_word = word
+    for word in line.split():
+        word = word.lower()
+        if word in word_index_dict:
+            counts[word_index_dict[previous_word]][word_index_dict[word]] += 1
+        previous_word = word
 f.close()
 
 #normalize counts
@@ -58,5 +51,5 @@ output_probs = [
 with codecs.open('bigram_probs.txt', 'w', encoding='utf-8') as out_file:
     for prev_word, word in output_probs:
         if prev_word in word_index_dict and word in word_index_dict:
-            prob = prob_matrix[word_index_dict[prev_word], word_index_dict[word]]
-            out_file.write(f"p({word} | {prev_word}) = {prob}\n")
+            prob = prob_matrix[word_index_dict[word], word_index_dict[prev_word]]
+            out_file.write(f"p({prev_word} | {word}) = {prob}\n")
