@@ -8,55 +8,43 @@ NLP A2: N-Gram Language Models
 DO NOT SHARE/DISTRIBUTE SOLUTIONS WITHOUT THE INSTRUCTOR'S PERMISSION
 """
 
+import codecs
 import numpy as np
 from sklearn.preprocessing import normalize
 from generate import GENERATE
-import codecs
+import random
+
 
 vocab = codecs.open("brown_vocab_100.txt")
 
 #load the indices dictionary
 word_index_dict = {}
-for i, line in enumerate(vocab):    
-    word_index_dict[line.strip()] = i
-vocab.close()
-
-# Write the dictionary to a file
-with codecs.open('word_to_index_100.txt', 'w', encoding='utf-8') as wf:
-    # Convert the dictionary to a string and write it to the file
-    wf.write(str(word_index_dict))
-wf.close()
+for i, line in enumerate(vocab):
+    #TODO: import part 1 code to build dictionary 
+    word_index_dict[line.rstrip()] = i
 
 f = codecs.open("brown_100.txt")
 
-#initialize numpy 0s array
-vocab_size = len(word_index_dict)
-counts = np.zeros((vocab_size, vocab_size), dtype=int)
+#TODO: initialize numpy 0s array
+counts = np.zeros((len(word_index_dict), len(word_index_dict)))
 
-#iterate through file and update counts
+#TODO: iterate through file and update counts
+previous_word = '<s>'
 for line in f:
-    words = line.strip().split()
-    if len(words) > 1:
-        prev_word = '<s>' 
-        for word in words:
-            if word in word_index_dict and prev_word in word_index_dict:
-                counts[word_index_dict[prev_word], word_index_dict[word]] += 1
-            prev_word = word
+    for word in line.split():
+        word = word.lower()
+        if word in word_index_dict:
+            counts[word_index_dict[previous_word]][word_index_dict[word]] += 1
+            #print(counts[word_index_dict[previous_word]][word_index_dict[word]])
+        previous_word = word
 f.close()
 
-#normalize counts
-prob_matrix = normalize(counts, norm='l1', axis=1)
+#TODO: normalize counts
+probs = normalize(counts, norm='l1', axis=1)
 
-#writeout bigram probabilities
-output_probs = [
-    ('the', 'all'),
-    ('jury', 'the'),
-    ('campaign', 'the'),
-    ('calls', 'anonymous')
-]
-
-with codecs.open('bigram_probs.txt', 'w', encoding='utf-8') as out_file:
-    for prev_word, word in output_probs:
-        if prev_word in word_index_dict and word in word_index_dict:
-            prob = prob_matrix[word_index_dict[prev_word], word_index_dict[word]]
-            out_file.write(f"p({word} | {prev_word}) = {prob}\n")
+#TODO: writeout bigram probabilities
+ 
+print("p(the | all):", probs[word_index_dict['all']][word_index_dict['the']])
+print("p(jury | the):", probs[word_index_dict['the']][word_index_dict['jury']])
+print("p(campaign | the):", probs[word_index_dict['the']][word_index_dict['campaign']])
+print("p(calls | anonymous):", probs[word_index_dict['anonymous']][word_index_dict['calls']])
