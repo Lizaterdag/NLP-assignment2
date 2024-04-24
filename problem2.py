@@ -24,11 +24,11 @@ f = open("brown_100.txt")
 
 #initialize counts to a zero vector
 counts = np.zeros(len(word_index_dict))
-#iterate through file and update counts
 
+#iterate through file and update counts
 for line in f:
     for word in line.split():
-        word.lower()
+        word = word.lower()
         if word in word_index_dict:
             counts[word_index_dict[word]] += 1
 f.close()
@@ -37,6 +37,7 @@ f.close()
 probs = counts / np.sum(counts)
     
 np.savetxt('unigram_probs.txt', probs)
+
 
 
 
