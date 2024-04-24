@@ -38,7 +38,7 @@ probs = counts / np.sum(counts)
     
 np.savetxt('unigram_probs.txt', probs)
 
-with codecs.open('perplexity_problem2.txt', 'w', encoding='utf-8') as out_file:
+with codecs.open('unigram_eval.txt', 'w', encoding='utf-8') as out_file:
     f = open("toy_corpus.txt")
     for line in f:
         sentprob = 1
