@@ -38,7 +38,22 @@ probs = counts / np.sum(counts)
     
 np.savetxt('unigram_probs.txt', probs)
 
+with codecs.open('perplexity_problem2.txt', 'w', encoding='utf-8') as out_file:
+    f = open("toy_corpus.txt")
+    for line in f:
+        sentprob = 1
+        words = line.split()
+        sent_len = len(words)
+        for i, word in enumerate(words):
+            word = word.lower()
+            if word in word_index_dict:
+                wordprob = probs[word_index_dict[word]]
+                sentprob *= wordprob
+        
+        perplexity = 1/(pow(sentprob, 1.0/sent_len))            
+        out_file.write(f"{perplexity}\n")
 
+f.close()
 
 
 
