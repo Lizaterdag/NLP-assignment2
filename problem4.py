@@ -30,11 +30,13 @@ counts = np.zeros((vocab_size, vocab_size), dtype=float)
 #iterate through file and update counts
 previous_word = '<s>'
 for line in f:
-    for word in line.split():
-        word = word.lower()
-        if word in word_index_dict:
-            counts[word_index_dict[previous_word]][word_index_dict[word]] += 1
-        previous_word = word
+    words = line.split()
+    for i, word in enumerate(words):
+        if i > 0: 
+            word = word.lower()
+            if word in word_index_dict:
+                counts[word_index_dict[previous_word],word_index_dict[word]] += 1
+            previous_word = word
 f.close()
 
 counts += 0.1
@@ -51,7 +53,11 @@ output_probs = [
 ]
 
 with codecs.open('smooth_probs.txt', 'w', encoding='utf-8') as out_file:
-    for prev_word, word in output_probs:
+    for word, prev_word in output_probs:
         if prev_word in word_index_dict and word in word_index_dict:
-            prob = prob_matrix[word_index_dict[word], word_index_dict[prev_word]]
+            prob = prob_matrix[word_index_dict[prev_word], word_index_dict[word]]
             out_file.write(f"p({prev_word} | {word}) = {prob}\n")
+
+#####
+#PROBLEM 6
+#####

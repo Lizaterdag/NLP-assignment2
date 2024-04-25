@@ -1,0 +1,4 @@
+p(all | the) = 1.0
+p(the | jury) = 0.08333333333333333
+p(the | campaign) = 0.00641025641025641
+p(anonymous | calls) = 0.3333333333333333
