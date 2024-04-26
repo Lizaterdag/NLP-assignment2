@@ -28,15 +28,16 @@ vocab_size = len(word_index_dict)
 counts = np.zeros((vocab_size, vocab_size), dtype=int)
 
 #iterate through file and update counts
-previous_word = '<s>'  # Start of sentence marker
+
 for line in f:
-    words = line.strip().split() + ['</s>']  # Add end of sentence marker
+    previous_word = '<s>'  # Start of sentence marker
+    words = line.strip().split()  # Add end of sentence marker
     for word in words[1:]:
         word = word.lower()
         if previous_word in word_index_dict and word in word_index_dict:
             counts[word_index_dict[previous_word], word_index_dict[word]] += 1
         previous_word = word  # Update previous word
-    previous_word = '<s>'  # Reset to start for next sentence
+        
 f.close()
 
 #normalize counts
@@ -66,7 +67,6 @@ with codecs.open('bigram_eval.txt', 'w', encoding='utf-8') as out_file, \
     
     for line in toy_corpus:
         words = line.strip().split()
-        print(words)
         sentprob = 1
         sent_len = len(words) - 1
         previous_word = '<s>'
@@ -74,7 +74,6 @@ with codecs.open('bigram_eval.txt', 'w', encoding='utf-8') as out_file, \
         # Calculate the joint probability of the sentence
         for current_word in words[1:]:  # Start from the first actual word after <s>
             current_word = current_word.lower()
-            print(current_word)
             if previous_word in word_index_dict and current_word in word_index_dict:
                 idx_prev = word_index_dict[previous_word]
                 idx_curr = word_index_dict[current_word]

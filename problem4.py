@@ -28,17 +28,18 @@ vocab_size = len(word_index_dict)
 counts = np.zeros((vocab_size, vocab_size), dtype=float)
 
 #iterate through file and update counts
-previous_word = '<s>'
 for line in f:
-    words = line.split()
-    for i, word in enumerate(words):
-        if i > 0: 
-            word = word.lower()
-            if word in word_index_dict:
-                counts[word_index_dict[previous_word],word_index_dict[word]] += 1
-            previous_word = word
+    previous_word = '<s>'  # Start of sentence marker
+    words = line.strip().split()  # Add end of sentence marker
+    for word in words[1:]:
+        word = word.lower()
+        if previous_word in word_index_dict and word in word_index_dict:
+            counts[word_index_dict[previous_word], word_index_dict[word]] += 1
+        previous_word = word  # Update previous word
+        
 f.close()
 
+#apply smoothing
 counts += 0.1
 
 #normalize counts
@@ -61,3 +62,36 @@ with codecs.open('smooth_probs.txt', 'w', encoding='utf-8') as out_file:
 #####
 #PROBLEM 6
 #####
+
+with codecs.open('smoothed_eval.txt', 'w', encoding='utf-8') as out_file, \
+     codecs.open("toy_corpus.txt", encoding='utf-8') as toy_corpus:
+    
+    
+    for line in toy_corpus:
+        words = line.strip().split()
+        print(words)
+        sentprob = 1
+        sent_len = len(words) - 1
+        previous_word = '<s>'
+
+        # Calculate the joint probability of the sentence
+        for current_word in words[1:]:  # Start from the first actual word after <s>
+            current_word = current_word.lower()
+            if previous_word in word_index_dict and current_word in word_index_dict:
+                idx_prev = word_index_dict[previous_word]
+                idx_curr = word_index_dict[current_word]
+                wordprob = prob_matrix[idx_prev, idx_curr]
+                sentprob *= wordprob
+            else:
+                # If the bigram is not found, assign a small probability (smoothing could be applied here)
+                sentprob *= 1e-12
+            previous_word = current_word
+
+        # Calculate perplexity
+        if sentprob > 0:
+            perplexity = 1 / (pow(sentprob, 1.0 / sent_len))
+        else:
+            perplexity = float('inf')  # Handle case where sentprob is 0 (logically impossible in this setup due to smoothing)
+
+        # Write the perplexity of the sentence to the output file
+        out_file.write(f"{perplexity}\n")
