@@ -31,7 +31,7 @@ counts = np.zeros((vocab_size, vocab_size), dtype=int)
 previous_word = '<s>'  # Start of sentence marker
 for line in f:
     words = line.strip().split() + ['</s>']  # Add end of sentence marker
-    for word in words:
+    for word in words[1:]:
         word = word.lower()
         if previous_word in word_index_dict and word in word_index_dict:
             counts[word_index_dict[previous_word], word_index_dict[word]] += 1
@@ -63,33 +63,35 @@ with codecs.open('bigram_probs.txt', 'w', encoding='utf-8') as out_file:
 with codecs.open('bigram_eval.txt', 'w', encoding='utf-8') as out_file, \
      codecs.open("toy_corpus.txt", encoding='utf-8') as toy_corpus:
     
+    
     for line in toy_corpus:
-        words = ['<s>'] + line.strip().split()
+        words = line.strip().split()
+        print(words)
         sentprob = 1
+        sent_len = len(words) - 1
         previous_word = '<s>'
 
-     # Calculate the joint probability of the sentence
-    for current_word in words[1:]:  # Start from the first actual word after <s>
-        current_word = current_word.lower()
-        if previous_word in word_index_dict and current_word in word_index_dict:
-            idx_prev = word_index_dict[previous_word]
-            idx_curr = word_index_dict[c000000000urrent_word]
-            wordprob = prob_matrix[idx_prev, idx_curr]
-            sentprob *= wordprob
+        # Calculate the joint probability of the sentence
+        for current_word in words[1:]:  # Start from the first actual word after <s>
+            current_word = current_word.lower()
+            print(current_word)
+            if previous_word in word_index_dict and current_word in word_index_dict:
+                idx_prev = word_index_dict[previous_word]
+                idx_curr = word_index_dict[current_word]
+                wordprob = prob_matrix[idx_prev, idx_curr]
+                sentprob *= wordprob
+            else:
+                # If the bigram is not found, assign a small probability (smoothing could be applied here)
+                sentprob *= 1e-12
+            previous_word = current_word
+
+        # Calculate perplexity
+        if sentprob > 0:
+            perplexity = 1 / (pow(sentprob, 1.0 / sent_len))
         else:
-            # If the bigram is not found, assign a small probability (smoothing could be applied here)
-            sentprob *= 1e-12
-        previous_word = current_word
+            perplexity = float('inf')  # Handle case where sentprob is 0 (logically impossible in this setup due to smoothing)
 
-    # Calculate sentence length excluding the start symbol <s>
-    sent_len = len(words) - 1
-    # Calculate perplexity
-    if sentprob > 0:
-        perplexity = 1 / (pow(sentprob, 1.0 / sent_len))
-    else:
-        perplexity = float('inf')  # Handle case where sentprob is 0 (logically impossible in this setup due to smoothing)
-
-    # Write the perplexity of the sentence to the output file
-    out_file.write(f"{perplexity}\n")
+        # Write the perplexity of the sentence to the output file
+        out_file.write(f"{perplexity}\n")
 
 
