@@ -82,16 +82,11 @@ with codecs.open('smoothed_eval.txt', 'w', encoding='utf-8') as out_file, \
                 idx_curr = word_index_dict[current_word]
                 wordprob = prob_matrix[idx_prev, idx_curr]
                 sentprob *= wordprob
-            else:
-                # If the bigram is not found, assign a small probability (smoothing could be applied here)
-                sentprob *= 1e-12
+
             previous_word = current_word
 
         # Calculate perplexity
-        if sentprob > 0:
-            perplexity = 1 / (pow(sentprob, 1.0 / sent_len))
-        else:
-            perplexity = float('inf')  # Handle case where sentprob is 0 (logically impossible in this setup due to smoothing)
+        perplexity = 1 / (pow(sentprob, 1.0 / sent_len))
 
         # Write the perplexity of the sentence to the output file
         out_file.write(f"{perplexity}\n")
