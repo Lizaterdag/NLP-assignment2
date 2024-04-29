@@ -88,4 +88,12 @@ with codecs.open('bigram_eval.txt', 'w', encoding='utf-8') as out_file, \
         # Write the perplexity of the sentence to the output file
         out_file.write(f"{perplexity}\n")
 
-
+#####
+#PROBLEM 7
+#####
+max_words = 15
+num_sent_generated = 10
+with codecs.open('bigram_generation.txt', 'w', encoding='utf-8') as out_file:
+    for i in range(num_sent_generated):
+            sentence = GENERATE(word_index_dict, prob_matrix, "bigram", max_words, "<s>")
+            out_file.write(f"{sentence}\n")

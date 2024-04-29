@@ -69,7 +69,6 @@ with codecs.open('smoothed_eval.txt', 'w', encoding='utf-8') as out_file, \
     
     for line in toy_corpus:
         words = line.strip().split()
-        print(words)
         sentprob = 1
         sent_len = len(words) - 1
         previous_word = '<s>'
@@ -90,3 +89,13 @@ with codecs.open('smoothed_eval.txt', 'w', encoding='utf-8') as out_file, \
 
         # Write the perplexity of the sentence to the output file
         out_file.write(f"{perplexity}\n")
+
+#####
+#PROBLEM 7
+#####
+max_words = 15
+num_sent_generated = 10
+with codecs.open('smoothed_generation.txt', 'w', encoding='utf-8') as out_file:
+    for i in range(num_sent_generated):
+            sentence = GENERATE(word_index_dict, prob_matrix, "bigram", max_words, "<s>")
+            out_file.write(f"{sentence}\n")

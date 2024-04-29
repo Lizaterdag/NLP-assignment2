@@ -61,3 +61,14 @@ f.close()
 
 
 
+#####
+#PROBLEM 7
+#####
+max_words = 15
+num_sent_generated = 10
+with codecs.open('unigram_generation.txt', 'w', encoding='utf-8') as out_file:
+    for i in range(num_sent_generated):
+            sentence = GENERATE(word_index_dict, probs, "unigram", max_words, "<s>")
+            out_file.write(f"{sentence}\n")
+
+
